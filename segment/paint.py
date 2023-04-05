@@ -34,6 +34,7 @@ import platform
 import sys
 sys.path.insert(0,r'C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection')
 import PhaseShifting as ps
+import json
 from pathlib import Path
 
 import torch
@@ -86,7 +87,8 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
         retina_masks=True,
         mask_opacity=0.5,
         part_color='black',
-        first_run=False):
+        first_run=False,
+        quick_load=False):
     
     if first_run:
         ps.parameterize_camera()
@@ -96,10 +98,14 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
     source=r"C:\Users\Design\Desktop\AE\stream_temp\stream.png"
     weights=r"C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection\weights segment\weights\best.pt"
     save_img = not nosave and not source.endswith('.txt')  # save inference images
-    is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
-    is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
-    webcam = source.isnumeric() or source.endswith('.streams') or (is_url and not is_file)
-    screenshot = source.lower().startswith('screen')
+    #is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
+    is_file=True
+    #is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
+    is_url=False
+    #webcam = source.isnumeric() or source.endswith('.streams') or (is_url and not is_file)
+    webcam=False
+    #screenshot = source.lower().startswith('screen')
+    screenshot=False
     if is_url and is_file:
         source = check_file(source)  # download
 
@@ -283,8 +289,17 @@ def parse_opt():
     parser.add_argument('--mask-opacity',default=0.5,help='value between 0~1')
     parser.add_argument('--part-color',required=True,help='color of the part (black,white,red,silver)')
     parser.add_argument('--first-run',action='store_true',help='whether to run the first time')
+    parser.add_argument('--quick-load',action='store_true',help='whether to load the parameters quickly')
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
+    if opt.quick_load:
+        with open('params.json','r') as params:
+            params = json.load(params)
+            opt.retina_masks=params['retina_masks']
+            opt.mask_opacity=params['mask_opacity']
+            opt.first_run=params['first_run']
+            opt.nosave=params['nosave']
+            opt.view_img=params['view_img']
     print_args(vars(opt))
     return opt
 
