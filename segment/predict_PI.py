@@ -32,6 +32,8 @@ import argparse
 import os
 import platform
 import sys
+sys.path.insert(0,r'C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection')
+import PhaseShifting as ps
 from pathlib import Path
 
 import torch
@@ -54,37 +56,45 @@ from utils.torch_utils import select_device, smart_inference_mode
 
 
 @smart_inference_mode()
-def run(
-    weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
-    source=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
-    data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
-    imgsz=(640, 640),  # inference size (height, width)
-    conf_thres=0.25,  # confidence threshold
-    iou_thres=0.45,  # NMS IOU threshold
-    max_det=1000,  # maximum detections per image
-    device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
-    view_img=False,  # show results
-    save_txt=False,  # save results to *.txt
-    save_conf=False,  # save confidences in --save-txt labels
-    save_crop=False,  # save cropped prediction boxes
-    nosave=False,  # do not save images/videos
-    classes=None,  # filter by class: --class 0, or --class 0 2 3
-    agnostic_nms=False,  # class-agnostic NMS
-    augment=False,  # augmented inference
-    visualize=False,  # visualize features
-    update=False,  # update all models
-    project=ROOT / 'runs/predict-seg',  # save results to project/name
-    name='exp',  # save results to project/name
-    exist_ok=False,  # existing project/name ok, do not increment
-    line_thickness=3,  # bounding box thickness (pixels)
-    hide_labels=False,  # hide labels
-    hide_conf=False,  # hide confidences
-    half=False,  # use FP16 half-precision inference
-    dnn=False,  # use OpenCV DNN for ONNX inference
-    vid_stride=1,  # video frame-rate stride
-    retina_masks=False,
-):
-    source = str(source)
+def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
+        source=ROOT / 'data/images',  # file/dir/URL/glob/screen/0(webcam)
+        data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
+        imgsz=(640, 640),  # inference size (height, width)
+        conf_thres=0.25,  # confidence threshold
+        iou_thres=0.45,  # NMS IOU threshold
+        max_det=1000,  # maximum detections per image
+        device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
+        view_img=False,  # show results
+        save_txt=False,  # save results to *.txt
+        save_conf=False,  # save confidences in --save-txt labels
+        save_crop=False,  # save cropped prediction boxes
+        nosave=False,  # do not save images/videos
+        classes=None,  # filter by class: --class 0, or --class 0 2 3
+        agnostic_nms=False,  # class-agnostic NMS
+        augment=False,  # augmented inference
+        visualize=False,  # visualize features
+        update=False,  # update all models
+        project=ROOT / 'runs/predict-seg',  # save results to project/name
+        name='exp',  # save results to project/name
+        exist_ok=False,  # existing project/name ok, do not increment
+        line_thickness=3,  # bounding box thickness (pixels)
+        hide_labels=False,  # hide labels
+        hide_conf=False,  # hide confidences
+        half=False,  # use FP16 half-precision inference
+        dnn=False,  # use OpenCV DNN for ONNX inference
+        vid_stride=1,  # video frame-rate stride
+        retina_masks=True,
+        mask_opacity=0.5,
+        part_color='black',
+        first_run=False):
+    
+    if first_run:
+        ps.parameterize_camera()
+    ps.main(stream=True,color='silver')
+
+    #source = str(source)
+    source=r"C:\Users\Design\Desktop\AE\stream_temp\stream.png"
+    weights=r"C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection\weights segment\weights\best.pt"
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -178,7 +188,7 @@ def run(
                     masks,
                     colors=[colors(x, True) for x in det[:, 5]],
                     im_gpu=torch.as_tensor(im0, dtype=torch.float16).to(device).permute(2, 0, 1).flip(0).contiguous() /
-                    255 if retina_masks else im[i],alpha=0.0)
+                    255 if retina_masks else im[i],alpha=float(mask_opacity))
 
                 # Write results
                 for j, (*xyxy, conf, cls) in enumerate(reversed(det[:, :6])):
@@ -204,8 +214,9 @@ def run(
                     cv2.namedWindow(str(p), cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)  # allow window resize (Linux)
                     cv2.resizeWindow(str(p), im0.shape[1], im0.shape[0])
                 cv2.imshow(str(p), im0)
-                if cv2.waitKey(1) == ord('q'):  # 1 millisecond
-                    exit()
+                # if cv2.waitKey(1) == ord('q'):  # 1 millisecond
+                #     exit()
+                cv2.waitKey(0)
 
             # Save results (image with detections)
             if save_img:
@@ -269,6 +280,9 @@ def parse_opt():
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
     parser.add_argument('--vid-stride', type=int, default=1, help='video frame-rate stride')
     parser.add_argument('--retina-masks', action='store_true', help='whether to plot masks in native resolution')
+    parser.add_argument('--mask-opacity',default=0.5,help='value between 0~1')
+    parser.add_argument('--part-color',required=True,help='color of the part (black,white,red,silver)')
+    parser.add_argument('--first-run',action='store_true',help='whether to run the first time')
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
     print_args(vars(opt))

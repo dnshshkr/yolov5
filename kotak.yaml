@@ -1,0 +1,13 @@
+train: C:/Users/Design/Downloads/Compressed/paint-inspection-(bbox)/train/images
+val: C:/Users/Design/Downloads/Compressed/paint-inspection-(bbox)/valid/images
+test: C:/Users/Design/Downloads/Compressed/paint-inspection-(bbox)/test/images
+
+nc: 6
+names: ['ROI', 'dust', 'fingerprint', 'paint sagging', 'scratch', 'string']
+
+roboflow:
+  workspace: danish-shukor-5pnil
+  project: paint-inspection-bbox
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/danish-shukor-5pnil/paint-inspection-bbox/dataset/1
