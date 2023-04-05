@@ -95,6 +95,7 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
     ps.main(stream=True,color='silver')
 
     #source = str(source)
+    #applied source and weight
     source=r"C:\Users\Design\Desktop\AE\stream_temp\stream.png"
     weights=r"C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection\weights segment\weights\best.pt"
     save_img = not nosave and not source.endswith('.txt')  # save inference images
@@ -295,6 +296,8 @@ def parse_opt():
     if opt.quick_load:
         with open('params.json','r') as params:
             params = json.load(params)
+            opt.source=params['source']
+            opt.weights=params['weights']
             opt.retina_masks=params['retina_masks']
             opt.mask_opacity=params['mask_opacity']
             opt.first_run=params['first_run']
