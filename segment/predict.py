@@ -35,7 +35,6 @@ import sys
 from pathlib import Path
 
 import torch
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[1]  # YOLOv5 root directory
@@ -178,7 +177,7 @@ def run(
                     masks,
                     colors=[colors(x, True) for x in det[:, 5]],
                     im_gpu=torch.as_tensor(im0, dtype=torch.float16).to(device).permute(2, 0, 1).flip(0).contiguous() /
-                    255 if retina_masks else im[i],alpha=0.0)
+                    255 if retina_masks else im[i])
 
                 # Write results
                 for j, (*xyxy, conf, cls) in enumerate(reversed(det[:, :6])):
