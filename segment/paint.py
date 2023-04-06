@@ -32,9 +32,13 @@ import argparse
 import os
 import platform
 import sys
-sys.path.insert(0,r'C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection')
-import PhaseShifting as ps
 import json
+f=open('params.json','r')
+params=json.load(f)
+f.close()
+repo_path=params['repo_path']
+sys.path.insert(0,repo_path)
+import PhaseShifting as ps
 from pathlib import Path
 
 import torch
@@ -96,8 +100,8 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
 
     #source = str(source)
     #applied source and weight
-    source=r"C:\Users\Design\Desktop\AE\stream_temp\stream.png"
-    weights=r"C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection\weights segment\weights\best.pt"
+    #source=r"C:\Users\Design\Desktop\AE\stream_temp\stream.png"
+    #weights=r"C:\Users\Design\Desktop\AE\Paint Inspection\Paint-Inspection\weights segment\weights\best.pt"
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     #is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
     is_file=True
@@ -255,9 +259,11 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
     if update:
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
+    ps.delete_stream_temp()  # delete temporary stream files
 
 
 def parse_opt():
+    global params
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'yolov5s-seg.pt', help='model path(s)')
     parser.add_argument('--source', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
@@ -294,16 +300,16 @@ def parse_opt():
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
     if opt.quick_load:
-        with open('params.json','r') as params:
-            params = json.load(params)
-            opt.source=params['source']
-            opt.weights=params['weights']
-            opt.retina_masks=params['retina_masks']
-            opt.mask_opacity=params['mask_opacity']
-            opt.first_run=params['first_run']
-            opt.nosave=params['nosave']
-            opt.view_img=params['view_img']
-            opt.hide_conf=params['hide_conf']
+        # with open('params.json','r') as params:
+        #     params = json.load(params)
+        opt.source=params['source']
+        opt.weights=params['weights']
+        opt.retina_masks=params['retina_masks']
+        opt.mask_opacity=params['mask_opacity']
+        opt.first_run=params['first_run']
+        opt.nosave=params['nosave']
+        opt.view_img=params['view_img']
+        opt.hide_conf=params['hide_conf']
         del params
     print_args(vars(opt))
     return opt
