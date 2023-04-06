@@ -92,7 +92,7 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
     
     if first_run:
         ps.parameterize_camera()
-    ps.main(stream=True,color='silver')
+    ps.main(stream=True,color=part_color)
 
     #source = str(source)
     #applied source and weight
@@ -303,6 +303,8 @@ def parse_opt():
             opt.first_run=params['first_run']
             opt.nosave=params['nosave']
             opt.view_img=params['view_img']
+            opt.hide_conf=params['hide_conf']
+        del params
     print_args(vars(opt))
     return opt
 
