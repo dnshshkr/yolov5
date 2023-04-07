@@ -33,10 +33,10 @@ import os
 import platform
 import sys
 import json
-f=open('params.json','r')
-params=json.load(f)
+f=open('config.json','r')
+config=json.load(f)
 f.close()
-repo_path=params['repo_path']
+repo_path=config['repo_path']
 sys.path.insert(0,repo_path)
 import PhaseShifting as ps
 from pathlib import Path
@@ -90,11 +90,12 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
         vid_stride=1,  # video frame-rate stride
         retina_masks=True,
         mask_opacity=0.5,
+        camera='basler',
         part_color='black',
         first_run=False,
         quick_load=False):
     
-    if first_run:
+    if first_run and camera=='basler':
         ps.parameterize_camera()
     ps.main(stream=True,color=part_color)
 
@@ -263,7 +264,7 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
 
 
 def parse_opt():
-    global params
+    global config
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'yolov5s-seg.pt', help='model path(s)')
     parser.add_argument('--source', type=str, default=ROOT / 'data/images', help='file/dir/URL/glob/screen/0(webcam)')
@@ -294,6 +295,7 @@ def parse_opt():
     parser.add_argument('--vid-stride', type=int, default=1, help='video frame-rate stride')
     parser.add_argument('--retina-masks', action='store_true', help='whether to plot masks in native resolution')
     parser.add_argument('--mask-opacity',default=0.5,help='value between 0~1')
+    parser.add_argument('--camera',default='basler',help='camera number')
     parser.add_argument('--part-color',required=True,help='color of the part (black,white,red,silver)')
     parser.add_argument('--first-run',action='store_true',help='whether to run the first time')
     parser.add_argument('--quick-load',action='store_true',help='whether to load the parameters quickly')
@@ -302,15 +304,16 @@ def parse_opt():
     if opt.quick_load:
         # with open('params.json','r') as params:
         #     params = json.load(params)
-        opt.source=params['source']
-        opt.weights=params['weights']
-        opt.retina_masks=params['retina_masks']
-        opt.mask_opacity=params['mask_opacity']
-        opt.first_run=params['first_run']
-        opt.nosave=params['nosave']
-        opt.view_img=params['view_img']
-        opt.hide_conf=params['hide_conf']
-        del params
+        opt.camera=config['camera']
+        opt.source=config['source']
+        opt.weights=config['weights']
+        opt.retina_masks=config['retina_masks']
+        opt.mask_opacity=config['mask_opacity']
+        opt.first_run=config['first_run']
+        opt.nosave=config['nosave']
+        opt.view_img=config['view_img']
+        opt.hide_conf=config['hide_conf']
+        del config
     print_args(vars(opt))
     return opt
 
