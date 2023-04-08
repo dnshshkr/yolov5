@@ -38,7 +38,7 @@ config=json.load(f)
 f.close()
 repo_path=config['repo_path']
 sys.path.insert(0,repo_path)
-import PhaseShifting as ps
+import PhaseShifting_copy as ps
 from pathlib import Path
 
 import torch
@@ -97,7 +97,11 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
     
     if first_run and camera=='basler':
         ps.parameterize_camera()
-    ps.main(stream=True,color=part_color)
+    if camera=='webcam':
+        id=1
+    elif camera=='basler':
+        id=0
+    ps.main(cam=id,stream=True,color=part_color)
 
     #source = str(source)
     #applied source and weight
