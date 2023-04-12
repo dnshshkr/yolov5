@@ -95,13 +95,11 @@ def run(weights=ROOT / 'yolov5s-seg.pt',  # model.pt path(s)
         first_run=False,
         quick_load=False):
     
-    if first_run and camera=='basler':
-        ps.parameterize_camera()
     if camera=='webcam':
         id=1
     elif camera=='basler':
         id=0
-    ps.main(cam=id,stream=True,color=part_color)
+    ps.main(cam=id,stream=True,color=part_color,first_time_run=bool(first_run))
 
     #source = str(source)
     #applied source and weight
@@ -299,7 +297,7 @@ def parse_opt():
     parser.add_argument('--vid-stride', type=int, default=1, help='video frame-rate stride')
     parser.add_argument('--retina-masks', action='store_true', help='whether to plot masks in native resolution')
     parser.add_argument('--mask-opacity',default=0.5,help='value between 0~1')
-    parser.add_argument('--camera',default='basler',help='camera number')
+    parser.add_argument('--camera',default='basler',help='webcam/basler')
     parser.add_argument('--part-color',required=True,help='color of the part (black,white,red,silver)')
     parser.add_argument('--first-run',action='store_true',help='whether to run the first time')
     parser.add_argument('--quick-load',action='store_true',help='whether to load the parameters quickly')
