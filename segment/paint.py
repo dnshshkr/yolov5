@@ -38,7 +38,7 @@ config=json.load(f)
 f.close()
 repo_path=config['repo_path']
 sys.path.insert(0,repo_path)
-import PhaseShifting_copy as ps
+import PhaseShifting as ps
 from pathlib import Path
 
 import torch
