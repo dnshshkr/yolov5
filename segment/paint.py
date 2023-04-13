@@ -310,6 +310,7 @@ def parse_opt():
         opt.monitor=config['monitor']
         opt.source=config['source']
         opt.weights=config['weights']
+        opt.project=config['project']
         opt.retina_masks=config['retina_masks']
         opt.mask_opacity=config['mask_opacity']
         opt.first_run=config['first_run']
