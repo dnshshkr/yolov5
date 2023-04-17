@@ -36,8 +36,8 @@ import json
 f=open('config.json','r')
 config=json.load(f)
 f.close()
-repo_path=config['repo_path']
-sys.path.insert(0,repo_path)
+ps_path=config['ps_path']
+sys.path.insert(0,ps_path)
 import PhaseShifting as ps
 from pathlib import Path
 
