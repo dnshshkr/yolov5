@@ -82,6 +82,7 @@ def run(
     dnn=False,  # use OpenCV DNN for ONNX inference
     vid_stride=1,  # video frame-rate stride
     retina_masks=False,
+    mask_opacity=0.5
 ):
     source = str(source)
     save_img = not nosave and not source.endswith('.txt')  # save inference images
@@ -177,7 +178,8 @@ def run(
                     masks,
                     colors=[colors(x, True) for x in det[:, 5]],
                     im_gpu=torch.as_tensor(im0, dtype=torch.float16).to(device).permute(2, 0, 1).flip(0).contiguous() /
-                    255 if retina_masks else im[i])
+                    255 if retina_masks else im[i],
+                    alpha=mask_opacity)
 
                 # Write results
                 for j, (*xyxy, conf, cls) in enumerate(reversed(det[:, :6])):
@@ -268,6 +270,7 @@ def parse_opt():
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
     parser.add_argument('--vid-stride', type=int, default=1, help='video frame-rate stride')
     parser.add_argument('--retina-masks', action='store_true', help='whether to plot masks in native resolution')
+    parser.add_argument('--mask-opacity', type=float, default=0.5, help='mask opacity')
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
     print_args(vars(opt))
