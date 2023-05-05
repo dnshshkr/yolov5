@@ -235,6 +235,7 @@ def run(
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
     if update:
         strip_optimizer(weights[0])  # update model (to fix SourceChangeWarning)
+    ps.delete_stream_temp()  # delete temporary stream files
 
 
 def parse_opt():
