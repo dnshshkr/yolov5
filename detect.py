@@ -34,6 +34,10 @@ import os
 import platform
 import sys
 from pathlib import Path
+from platform import system
+if system().lower() == 'windows':
+    import pathlib
+    pathlib.PosixPath = pathlib.WindowsPath
 
 import torch
 

@@ -45,9 +45,22 @@ except (ImportError, AssertionError):
 
 from ultralytics.utils.checks import check_requirements
 
+from pathlib import Path
+import sys, platform, os
+FILE = Path(__file__).resolve()
+ROOT = FILE.parents[1]  # YOLOv5 root directory
+if str(ROOT) not in sys.path:
+    sys.path.append(str(ROOT))  # add ROOT to PATH
+if platform.system() != "Windows":
+    ROOT = Path(os.path.relpath(ROOT, Path.cwd()))  # relative
+
 from utils import TryExcept, emojis
 from utils.downloads import curl_download, gsutil_getsize
 from utils.metrics import box_iou, fitness
+
+# from . import TryExcept, emojis
+# from .downloads import curl_download, gsutil_getsize
+# from .metrics import box_iou, fitness
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[1]  # YOLOv5 root directory
